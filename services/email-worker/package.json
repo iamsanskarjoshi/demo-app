@@ -1,0 +1,16 @@
+{
+  "name": "email-worker",
+  "version": "1.0.0",
+  "description": "Email Notification Worker",
+  "main": "worker.js",
+  "scripts": {
+    "start": "node worker.js",
+    "dev": "nodemon worker.js"
+  },
+  "dependencies": {
+    "redis": "^4.6.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

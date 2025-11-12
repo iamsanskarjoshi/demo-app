@@ -1,0 +1,17 @@
+{
+  "name": "data-sync-worker",
+  "version": "1.0.0",
+  "description": "Data Synchronization Worker",
+  "main": "worker.js",
+  "scripts": {
+    "start": "node worker.js",
+    "dev": "nodemon worker.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.3",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # User Service API
+  user-service:
+    build: ../services/user-service
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DB_HOST=${MACHINE2_IP}
+      - DB_PORT=5432
+      - DB_NAME=microservices
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # Product Service API
+  product-service:
+    build: ../services/product-service
+    container_name: product-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - DB_HOST=${MACHINE2_IP}
+      - DB_PORT=5432
+      - DB_NAME=microservices
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # Email Worker (Background Service)
+  email-worker:
+    build: ../services/email-worker
+    container_name: email-worker
+    environment:
+      - REDIS_HOST=${MACHINE2_IP}
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis123
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # UI Service (Frontend)
+  ui-service:
+    build: ../services/ui-service
+    container_name: ui-service
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_MACHINE1_IP=${MACHINE1_IP:-localhost}
+      - REACT_APP_MACHINE2_IP=${MACHINE2_IP}
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
