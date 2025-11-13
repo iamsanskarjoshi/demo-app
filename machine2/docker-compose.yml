@@ -40,7 +40,7 @@ services:
     networks:
       - microservices-network
 
-  # Order Service API
+  # Order Service API (Primary on Machine 2)
   order-service:
     build: ../services/order-service
     container_name: order-service
@@ -62,6 +62,62 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # User Service API (Replica on Machine 2)
+  user-service-replica:
+    build: ../services/user-service
+    container_name: user-service-replica
+    ports:
+      - "3011:3001"
+    environment:
+      - PORT=3001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=microservices
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # Product Service API (Replica on Machine 2)
+  product-service-replica:
+    build: ../services/product-service
+    container_name: product-service-replica
+    ports:
+      - "3012:3002"
+    environment:
+      - PORT=3002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=microservices
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx-lb
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - order-service
+      - user-service-replica
+      - product-service-replica
     networks:
       - microservices-network
 

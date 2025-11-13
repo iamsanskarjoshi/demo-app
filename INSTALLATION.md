@@ -12,6 +12,10 @@ This guide will walk you through installing and testing the complete microservic
   - Machine 2: Minimum 2GB RAM, 20GB disk (for database)
 - Network connectivity between both machines
 
+ssh -i "m1.pem" ubuntu@ec2-44-223-110-127.compute-1.amazonaws.com
+
+ssh -i "m1.pem" ubuntu@ec2-44-197-131-96.compute-1.amazonaws.com
+
 ### Software Requirements (will be installed)
 - Docker
 - Docker Compose
@@ -27,6 +31,8 @@ This guide will walk you through installing and testing the complete microservic
 ```bash
 sudo apt update
 sudo apt upgrade -y
+sudo apt install git -y
+
 ```
 
 #### Step 1.2: Install Docker
@@ -87,6 +93,7 @@ cd ~
 hostname -I
 # Note down the IP address (e.g., 192.168.1.100)
 ```
+172.31.11.13 172.17.0.1 
 
 #### Step 2.2: Configure Firewall
 ```bash
@@ -249,7 +256,7 @@ cd ~/microservices-demo
 chmod +x test-all.sh
 
 # Run tests (assuming Machine 2 IP is 192.168.1.100)
-export MACHINE2_IP=192.168.1.100
+export MACHINE2_IP=172.31.11.13
 ./test-all.sh
 ```
 

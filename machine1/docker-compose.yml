@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # User Service API
+  # User Service API (Primary on Machine 1)
   user-service:
     build: ../services/user-service
     container_name: user-service
@@ -18,7 +18,7 @@ services:
     networks:
       - microservices-network
 
-  # Product Service API
+  # Product Service API (Primary on Machine 1)
   product-service:
     build: ../services/product-service
     container_name: product-service
@@ -35,6 +35,26 @@ services:
     networks:
       - microservices-network
 
+  # Order Service API (Replica on Machine 1)
+  order-service-replica:
+    build: ../services/order-service
+    container_name: order-service-replica
+    ports:
+      - "3013:3003"
+    environment:
+      - PORT=3003
+      - DB_HOST=${MACHINE2_IP}
+      - DB_PORT=5432
+      - DB_NAME=microservices
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - REDIS_HOST=${MACHINE2_IP}
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis123
+    restart: unless-stopped
+    networks:
+      - microservices-network
+
   # Email Worker (Background Service)
   email-worker:
     build: ../services/email-worker
@@ -44,6 +64,22 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=redis123
     restart: unless-stopped
+    networks:
+      - microservices-network
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx-lb
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+    depends_on:
+      - user-service
+      - product-service
+      - order-service-replica
     networks:
       - microservices-network
 
